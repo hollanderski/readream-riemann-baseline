@@ -1,0 +1,274 @@
+[
+ {
+  "filename": "case02_s10.edf",
+  "subject": "10",
+  "n_epochs": 29,
+  "anger": 0,
+  "apprehension": 1,
+  "confusion": 0
+ },
+ {
+  "filename": "case03_s10.edf",
+  "subject": "10",
+  "n_epochs": 30,
+  "anger": 1,
+  "apprehension": 1,
+  "confusion": 1
+ },
+ {
+  "filename": "case04_s10.edf",
+  "subject": "10",
+  "n_epochs": 30,
+  "anger": 1,
+  "apprehension": 1,
+  "confusion": 0
+ },
+ {
+  "filename": "case05_s10.edf",
+  "subject": "10",
+  "n_epochs": 30,
+  "anger": 1,
+  "apprehension": 0,
+  "confusion": 1
+ },
+ {
+  "filename": "case07_s10.edf",
+  "subject": "10",
+  "n_epochs": 30,
+  "anger": 1,
+  "apprehension": 0,
+  "confusion": 1
+ },
+ {
+  "filename": "case08_s10.edf",
+  "subject": "10",
+  "n_epochs": 30,
+  "anger": 1,
+  "apprehension": 1,
+  "confusion": 0
+ },
+ {
+  "filename": "case09_s10.edf",
+  "subject": "10",
+  "n_epochs": 30,
+  "anger": 1,
+  "apprehension": 1,
+  "confusion": 1
+ },
+ {
+  "filename": "case10_s10.edf",
+  "subject": "10",
+  "n_epochs": 30,
+  "anger": 1,
+  "apprehension": 1,
+  "confusion": 1
+ },
+ {
+  "filename": "case12_s11.edf",
+  "subject": "11",
+  "n_epochs": 30,
+  "anger": 0,
+  "apprehension": 0,
+  "confusion": 1
+ },
+ {
+  "filename": "case13_s11.edf",
+  "subject": "11",
+  "n_epochs": 30,
+  "anger": 0,
+  "apprehension": 0,
+  "confusion": 0
+ },
+ {
+  "filename": "case14_s11.edf",
+  "subject": "11",
+  "n_epochs": 30,
+  "anger": 1,
+  "apprehension": 1,
+  "confusion": 0
+ },
+ {
+  "filename": "case15_s11.edf",
+  "subject": "11",
+  "n_epochs": 30,
+  "anger": 0,
+  "apprehension": 0,
+  "confusion": 0
+ },
+ {
+  "filename": "case16_s11.edf",
+  "subject": "11",
+  "n_epochs": 30,
+  "anger": 0,
+  "apprehension": 0,
+  "confusion": 0
+ },
+ {
+  "filename": "case17_s11.edf",
+  "subject": "11",
+  "n_epochs": 30,
+  "anger": 0,
+  "apprehension": 0,
+  "confusion": 0
+ },
+ {
+  "filename": "case18_s11.edf",
+  "subject": "11",
+  "n_epochs": 30,
+  "anger": 0,
+  "apprehension": 0,
+  "confusion": 0
+ },
+ {
+  "filename": "case19_s11.edf",
+  "subject": "11",
+  "n_epochs": 30,
+  "anger": 0,
+  "apprehension": 0,
+  "confusion": 0
+ },
+ {
+  "filename": "case20_s11.edf",
+  "subject": "11",
+  "n_epochs": 30,
+  "anger": 1,
+  "apprehension": 0,
+  "confusion": 0
+ },
+ {
+  "filename": "case21_s11.edf",
+  "subject": "11",
+  "n_epochs": 30,
+  "anger": 0,
+  "apprehension": 0,
+  "confusion": 0
+ },
+ {
+  "filename": "case22_s11.edf",
+  "subject": "11",
+  "n_epochs": 30,
+  "anger": 0,
+  "apprehension": 0,
+  "confusion": 0
+ },
+ {
+  "filename": "case23_s12.edf",
+  "subject": "12",
+  "n_epochs": 30,
+  "anger": 1,
+  "apprehension": 1,
+  "confusion": 0
+ },
+ {
+  "filename": "case24_s12.edf",
+  "subject": "12",
+  "n_epochs": 30,
+  "anger": 1,
+  "apprehension": 0,
+  "confusion": 0
+ },
+ {
+  "filename": "case25_s12.edf",
+  "subject": "12",
+  "n_epochs": 30,
+  "anger": 1,
+  "apprehension": 1,
+  "confusion": 0
+ },
+ {
+  "filename": "case26_s12.edf",
+  "subject": "12",
+  "n_epochs": 30,
+  "anger": 1,
+  "apprehension": 0,
+  "confusion": 0
+ },
+ {
+  "filename": "case28_s12.edf",
+  "subject": "12",
+  "n_epochs": 30,
+  "anger": 0,
+  "apprehension": 0,
+  "confusion": 0
+ },
+ {
+  "filename": "case37_s14.edf",
+  "subject": "14",
+  "n_epochs": 30,
+  "anger": 0,
+  "apprehension": 0,
+  "confusion": 0
+ },
+ {
+  "filename": "case38_s14.edf",
+  "subject": "14",
+  "n_epochs": 30,
+  "anger": 1,
+  "apprehension": 0,
+  "confusion": 1
+ },
+ {
+  "filename": "case39_s15.edf",
+  "subject": "15",
+  "n_epochs": 30,
+  "anger": 0,
+  "apprehension": 1,
+  "confusion": 0
+ },
+ {
+  "filename": "case40_s15.edf",
+  "subject": "15",
+  "n_epochs": 30,
+  "anger": 1,
+  "apprehension": 1,
+  "confusion": 1
+ },
+ {
+  "filename": "case41_s15.edf",
+  "subject": "15",
+  "n_epochs": 30,
+  "anger": 0,
+  "apprehension": 1,
+  "confusion": 0
+ },
+ {
+  "filename": "case42_s15.edf",
+  "subject": "15",
+  "n_epochs": 30,
+  "anger": 0,
+  "apprehension": 1,
+  "confusion": 1
+ },
+ {
+  "filename": "case44_s15.edf",
+  "subject": "15",
+  "n_epochs": 30,
+  "anger": 0,
+  "apprehension": 1,
+  "confusion": 1
+ },
+ {
+  "filename": "case45_s15.edf",
+  "subject": "15",
+  "n_epochs": 30,
+  "anger": 0,
+  "apprehension": 0,
+  "confusion": 0
+ },
+ {
+  "filename": "case46_s15.edf",
+  "subject": "15",
+  "n_epochs": 30,
+  "anger": 0,
+  "apprehension": 0,
+  "confusion": 1
+ },
+ {
+  "filename": "case47_s15.edf",
+  "subject": "15",
+  "n_epochs": 30,
+  "anger": 1,
+  "apprehension": 0,
+  "confusion": 1
+ }
+]
