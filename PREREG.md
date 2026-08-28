@@ -72,3 +72,62 @@ Declared in advance so the conclusion is not chosen after seeing which way it we
 LOSO permutation nulls are about 1.5x wider than an independent-fold assumption predicts,
 so detectable-effect floors computed under independence are optimistic. This holds whether
 or not our own effect clears its floor.
+
+---
+
+# Addendum: learning curve, declared 2026-08-28 before any result
+
+Verified at the time of writing that zero `lc17_*.json` files existed and the array was
+still `PD`. Disclosure: the job (21470648) was submitted a few minutes before this
+paragraph was written. Nothing had run, so no result informed anything below, but the
+ordering is recorded rather than smoothed over.
+
+## What it tests
+
+On the same 9 subjects both designs scored, training on 16 subjects instead of 10 dropped
+apprehension balanced accuracy by 0.071. Training on more data made it worse. The curve
+varies ONLY the training-set size (k = 4, 8, 16 subjects), holding the 17 outer test folds
+fixed, 3 seeds each.
+
+## Predictions, committed in advance
+
+| mechanism | signature |
+|---|---|
+| subject heterogeneity the model cannot absorb | curve FALLS as k rises |
+| early stopping drifting with training-set size | curve FLAT, epochs-to-stop differs across k |
+| the 11-subject number was noise flattered by its split | curve FLAT, no trend, all k at chance |
+
+## Why it is worth running on a null result
+
+Not to rescue apprehension; apprehension is reported as a clean null regardless of what
+this shows. The curve tests the mechanism the paper's thesis rests on: that alignment is
+needed because pooling heterogeneous subjects hurts. A DL curve that falls with k beside a
+tangent-space curve that does not would carry that argument on a corpus where neither
+method reaches significance. If both curves are flat at chance, the conclusion is that
+REM_Turku carries no usable signal for either method, stated in one line.
+
+The matching tangent-space curve is run through the same folds and the same k values, or
+the comparison is not made at all.
+
+## Reporting rule
+
+The curve is reported whichever way it comes out, including flat. It does not become a
+finding only if it falls.
+
+---
+
+# Withdrawn, kept in the supplement as a warning
+
+The permutation null shuffled labels across subjects instead of within until 2026-08-28.
+The measured cost of that single error, on this corpus:
+
+| quantity | across-subject shuffle | within-subject shuffle |
+|---|---|---|
+| apparent fold dependence (measured/independent sd) | 1.50 | 1.15 |
+| apparent inter-fold correlation | +0.158 | +0.047 |
+| detectable-effect floor, p<.05 | 0.655 | 0.598 |
+
+The global shuffle moved every subject's base rate together, which is itself a shared
+perturbation across folds, so it manufactured the dependence it appeared to measure. The
+"LOSO nulls are 1.5x wider than independence predicts" claim is withdrawn. The table stays
+because it is a reusable warning for anyone running LOSO permutation tests.
