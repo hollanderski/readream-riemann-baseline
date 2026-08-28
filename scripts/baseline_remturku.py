@@ -33,6 +33,16 @@ sys.path.insert(0, "/orcd/scratch/orcd/010/ninon/reaDream/turku/riemann")
 sys.path.insert(0, "/orcd/scratch/orcd/010/ninon/reaDream/turku")
 from dc_ldm.models.EEGNet_Embedding_version import EEGNet_Embedding      # noqa: E402
 from ShallowConv_Embedding_version import ShallowConv_Embedding          # noqa: E402
+try:
+    # braindecode 1.7 renamed EEGNetv4 -> EEGNet. Importing a name we do not use made
+    # the whole try-block fail and silently set HAS_BD=False, which surfaced only as
+    # "braindecode not installed". Import exactly what is used, nothing more.
+    from braindecode.models import ShallowFBCSPNet                          # noqa: E402
+    HAS_BD = True
+    _BD_ERR = None
+except ImportError as _e:
+    HAS_BD = False
+    _BD_ERR = repr(_e)
 from tuning_core import build_optimizer, build_scheduler, train as repo_train, test as repo_test  # noqa: E402
 
 DEV = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -113,14 +123,38 @@ def make_windows(X, y, subj, files):
 
 
 def build(arch, cfg, n_ch, n_t, n_cls):
+    """Model factory.
+
+    `shallow_bd` is braindecode's reference ShallowFBCSPNet and is the DEFAULT going
+    forward. Ninon 2026-08-28: the 512-d embedding head in ShallowConv_Embedding exists
+    for the reconstruction goal in the imagination work. This is binary classification,
+    so there is no reason to carry it, and it costs a lot: our embedding variant has
+    1,290,338 parameters against 44,402 for the reference, almost all of it in the
+    Linear(flat_dim -> 512). Training a million-parameter head on 115 awakenings is a
+    plausible reason the DL baseline plateaus.
+
+    `shallow` (the embedding variant) is kept only so the two can be compared.
+    """
+    if arch == "shallow_bd":
+        if not HAS_BD:
+            raise RuntimeError(f"braindecode import failed: {_BD_ERR}")
+        return ShallowFBCSPNet(
+            n_chans=n_ch, n_outputs=n_cls, n_times=n_t,
+            n_filters_time=cfg.get("n_filters_time", 40),
+            filter_time_length=cfg.get("filter_time_length", 25),
+            n_filters_spat=cfg.get("n_filters_spat", 40),
+            pool_time_length=cfg.get("pool_time_length", 75),
+            pool_time_stride=cfg.get("pool_time_stride", 15),
+            batch_norm_alpha=cfg.get("bn_momentum", 0.1),
+            drop_prob=cfg["drop_prob"],
+            final_conv_length="auto").to(DEV)
     if arch == "shallow":
         return ShallowConv_Embedding(in_chans=n_ch, n_classes=n_cls,
                                      input_window_samples=n_t,
                                      drop_prob=cfg["drop_prob"]).to(DEV)
-    # NOTE: EEGNet_Embedding_version.py line 84 reads `self.lr` before line 106
-    # assigns it, so the default branch of `max_lr` raises AttributeError. Passing
-    # max_lr explicitly short-circuits it. Working around it here rather than editing
-    # the authoritative file.
+    # NOTE: EEGNet_Embedding_version.py line 84 reads `self.lr` before line 106 assigns
+    # it, so the default branch of `max_lr` raises. Passing max_lr explicitly avoids it
+    # without editing the authoritative file.
     return EEGNet_Embedding(in_chans=n_ch, n_classes=n_cls,
                             input_window_samples=n_t, F1=cfg["F1"], D=cfg["D"],
                             kernel_length=cfg["kernel_length"],
@@ -138,10 +172,15 @@ def train_eval(Xtr, ytr, Xva, yva, Xte, yte, arch, cfg, seed):
     set_all_seeds(seed)
     n_ch, n_t = Xtr.shape[1], Xtr.shape[2]
     model = build(arch, cfg, n_ch, n_t, 2)
-    loss_fn = nn.NLLLoss()          # p12_stable correction, see tuning_core docstring
+    # ShallowConv_Embedding and EEGNet_Embedding end in LogSoftmax, so NLLLoss (the
+    # p12_stable correction). braindecode's ShallowFBCSPNet returns raw logits, so it
+    # needs CrossEntropyLoss. Using the wrong one here silently halves the gradient.
+    loss_fn = nn.CrossEntropyLoss() if arch == "shallow_bd" else nn.NLLLoss()
     dl = lambda X, y, sh: DataLoader(
         TensorDataset(torch.tensor(X), torch.tensor(y, dtype=torch.long)),
         batch_size=cfg["batch_size"], shuffle=sh, drop_last=False)
+    if arch == "shallow_bd":                       # braindecode wants (b, ch, t)
+        Xtr, Xva, Xte = Xtr[..., 0], Xva[..., 0], Xte[..., 0]
     tr, va, te = dl(Xtr, ytr, True), dl(Xva, yva, False), dl(Xte, yte, False)
     opt = build_optimizer(model, cfg)
     sch = build_scheduler(opt, cfg, steps_per_epoch=max(1, len(tr)))
@@ -176,6 +215,14 @@ def grid_for(n_channels):
     return {
         "F1_D": g,
         "kernel_length": [32, 64, 96, 128, 160],
+        # ShallowFBCSPNet temporal params. braindecode defaults (25, 75, 15) are set for
+        # 250 Hz; this corpus is 500 Hz, so the doubled values restore the intended
+        # physiological scales (100 ms filter, 300 ms power window).
+        "filter_time_length": [25, 50, 75],
+        "pool_time_length": [75, 150, 225],
+        "pool_time_stride": [15, 30],
+        "n_filters_time": [20, 40, 80],
+        "n_filters_spat": [20, 40, 80],
         "depthwise_kernel_length": [16, 32, 64, 128, 256],   # CONSTRAINT 2
         "separable_kernel_length": [8, 16, 32],
         "activation": ["mish", "relu"],
@@ -221,12 +268,29 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--npz", required=True); ap.add_argument("--zip", required=True)
     ap.add_argument("--target", required=True, choices=list(HVDC))
-    ap.add_argument("--arch", required=True, choices=["eegnet", "shallow"])
+    ap.add_argument("--arch", required=True, choices=["eegnet", "shallow", "shallow_bd"])
     ap.add_argument("--epoch-kind", default="raw", choices=["raw", "csd"])
     ap.add_argument("--n-dev", type=int, default=6)
     ap.add_argument("--sweep-n", type=int, default=24)
     ap.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2, 3, 4])
     ap.add_argument("--out", required=True)
+    ap.add_argument("--defaults", action="store_true",
+                    help="PRIMARY REFERENCE mode (fundamental_ai 2026-08-28 ruling): use "
+                         "library defaults, zero selection, no argmax anywhere. Immune to "
+                         "the selection-on-noise objection because nothing is selected.")
+    ap.add_argument("--selection-stability", type=int, default=0,
+                    help="re-draw the dev split N times and record the argmax config each "
+                         "time. The instability of the winner measures directly how "
+                         "arbitrary a frozen config would have been.")
+    ap.add_argument("--train-subjects", type=int, default=0,
+                    help="cap outer training folds to this many subjects. Set to the dev "
+                         "fold size (5) to test whether the dev-vs-LOSO inversion is just "
+                         "train-size asymmetry.")
+    ap.add_argument("--frozen-config", type=str, default=None,
+                    help="path to a results JSON; reuse its frozen_config and SKIP the "
+                         "sweep. For permutation nulls: the config was selected once on "
+                         "real labels, so re-selecting it per shuffle would be a second "
+                         "selection surface and would inflate the null.")
     ap.add_argument("--shuffle-labels", type=int, default=0,
                     help="permutation null: shuffle labels WITHIN subject-blocks preserving "
                          "each subject's class balance, seeded by this value (0 = off)")
@@ -263,35 +327,90 @@ def main():
     print(f"F1/D pairs valid for this montage: {space['F1_D']}", flush=True)
     sel = sample_configs(space, a.sweep_n, np.random.default_rng(0))
 
-    # ---------- SWEEP on dev subjects only ----------
-    dmask = np.isin(subj, dev_subs)
-    Xd, yd, sd, fd = [X[i] for i in np.where(dmask)[0]], y[dmask], subj[dmask], np.array(files)[dmask]
-    dev_scores = []
-    for ci, cfg in enumerate(sel):
-        accs = []
-        for held in dev_subs:
-            tr = sd != held; te = sd == held
-            if yd[te].sum() == 0 or yd[te].sum() == te.sum():
-                continue
-            Xtr, ytr, _, _ = make_windows([Xd[i] for i in np.where(tr)[0]], yd[tr], sd[tr], fd[tr])
-            Xte, yte, _, fte = make_windows([Xd[i] for i in np.where(te)[0]], yd[te], sd[te], fd[te])
-            Xtr, Xte = standardize(Xtr, Xte)
-            k = max(1, int(0.2 * len(ytr)))
-            p, _ = train_eval(Xtr[k:], ytr[k:], Xtr[:k], ytr[:k], Xte, yte, a.arch, cfg, 0)
-            if len(p): accs.append(bal_acc(p, yte))
-        s = float(np.mean(accs)) if accs else 0.0
-        dev_scores.append(s)
-        print(f"  [sweep {ci+1}/{len(sel)}] dev bal.acc={s:.3f}  {cfg}", flush=True)
-    best_i = int(np.argmax(dev_scores))
-    frozen = sel[best_i]
-    print(f"\nFROZEN CONFIG (selected once on dev subjects {dev_subs}): {frozen}")
-    print(f"dev bal.acc={dev_scores[best_i]:.3f}\n", flush=True)
+    # ---------- SWEEP on dev subjects only (skipped when frozen or defaults) ----------
+    if a.defaults:
+        frozen = {"drop_prob": 0.5, "lr": 3e-4, "max_lr": 3e-3, "weight_decay": 0.0,
+                  "batch_size": 64, "epochs": 100, "patience": 25, "min_delta": 0.001,
+                  "optimizer": "adamw", "scheduler": "cycle", "pct_start": 0.3,
+                  "three_phase": True, "beta1": 0.9, "beta2": 0.999, "eps": 1e-8,
+                  "F1": 8, "D": 2, "kernel_length": 64, "depthwise_kernel_length": 32,
+                  "separable_kernel_length": 32,
+                  # braindecode ShallowFBCSPNet defaults, unchanged
+                  "n_filters_time": 40, "filter_time_length": 25, "n_filters_spat": 40,
+                  "pool_time_length": 75, "pool_time_stride": 15, "bn_momentum": 0.1}
+        dev_scores = []
+        print("DEFAULTS MODE: library defaults, no selection performed.", flush=True)
+        print(f"  config: {frozen}", flush=True)
+    elif a.frozen_config:
+        frozen = json.loads(Path(a.frozen_config).read_text())["frozen_config"]
+        dev_scores = []
+        print(f"FROZEN CONFIG reused from {a.frozen_config}, sweep skipped: {frozen}", flush=True)
+    else:
+        dmask = np.isin(subj, dev_subs)
+        Xd, yd, sd, fd = [X[i] for i in np.where(dmask)[0]], y[dmask], subj[dmask], np.array(files)[dmask]
+        dev_scores = []
+        for ci, cfg in enumerate(sel):
+            accs = []
+            for held in dev_subs:
+                tr = sd != held; te = sd == held
+                if yd[te].sum() == 0 or yd[te].sum() == te.sum():
+                    continue
+                Xtr, ytr, _, _ = make_windows([Xd[i] for i in np.where(tr)[0]], yd[tr], sd[tr], fd[tr])
+                Xte, yte, _, fte = make_windows([Xd[i] for i in np.where(te)[0]], yd[te], sd[te], fd[te])
+                Xtr, Xte = standardize(Xtr, Xte)
+                k = max(1, int(0.2 * len(ytr)))
+                p, _ = train_eval(Xtr[k:], ytr[k:], Xtr[:k], ytr[:k], Xte, yte, a.arch, cfg, 0)
+                if len(p): accs.append(bal_acc(p, yte))
+            s = float(np.mean(accs)) if accs else 0.0
+            dev_scores.append(s)
+            print(f"  [sweep {ci+1}/{len(sel)}] dev bal.acc={s:.3f}  {cfg}", flush=True)
+        best_i = int(np.argmax(dev_scores))
+        frozen = sel[best_i]
+        print(f"\nFROZEN CONFIG (selected once on dev subjects {dev_subs}): {frozen}")
+        print(f"dev bal.acc={dev_scores[best_i]:.3f}\n", flush=True)
+
+    # ---------- selection-stability diagnostic (fundamental_ai Q2) ----------
+    if a.selection_stability:
+        import collections
+        winners = collections.Counter()
+        for rep in range(a.selection_stability):
+            r2 = np.random.default_rng(1000 + rep)
+            ds = sorted(r2.choice(subs, a.n_dev, replace=False).tolist())
+            dm2 = np.isin(subj, ds)
+            Xd2 = [X[i] for i in np.where(dm2)[0]]; yd2 = y[dm2]; sd2 = subj[dm2]
+            sc = []
+            for cfg in sel:
+                accs = []
+                for held in ds:
+                    tr = sd2 != held; te = sd2 == held
+                    if yd2[te].sum() in (0, te.sum()): continue
+                    Xtr, ytr, _, _ = make_windows([Xd2[i] for i in np.where(tr)[0]], yd2[tr], sd2[tr], sd2[tr])
+                    Xte, yte, _, _ = make_windows([Xd2[i] for i in np.where(te)[0]], yd2[te], sd2[te], sd2[te])
+                    Xtr, Xte = standardize(Xtr, Xte)
+                    k2 = max(1, int(0.2 * len(ytr)))
+                    pr, _ = train_eval(Xtr[k2:], ytr[k2:], Xtr[:k2], ytr[:k2], Xte, yte, a.arch, cfg, 0)
+                    if len(pr): accs.append(bal_acc(pr, yte))
+                sc.append(float(np.mean(accs)) if accs else 0.0)
+            w = int(np.argmax(sc))
+            winners[w] += 1
+            print(f"  [stability {rep+1}/{a.selection_stability}] dev={ds} argmax=cfg{w} "
+                  f"spread={max(sc)-min(sc):.3f} best={max(sc):.3f}", flush=True)
+        print(f"\nSELECTION STABILITY: winning config across {a.selection_stability} dev "
+              f"redraws: {dict(winners)}", flush=True)
+        print(f"  modal winner chosen {winners.most_common(1)[0][1]}/{a.selection_stability} "
+              f"times. Binomial SE at dev-fold size is roughly 0.09-0.11, so a spread below "
+              f"that means dev cannot rank configs.", flush=True)
 
     # ---------- OUTER LOSO with the frozen config, 5 seeds ----------
     per_subject = {}
     for seed in a.seeds:
         for held in out_subs:
             tr = (subj != held) & np.isin(subj, out_subs); te = subj == held
+            if a.train_subjects:      # learning-curve check: cap train to k subjects
+                pool = [x for x in out_subs if x != held]
+                keep = np.random.default_rng(seed).choice(pool, min(a.train_subjects, len(pool)),
+                                                          replace=False).tolist()
+                tr = tr & np.isin(subj, keep)
             if y[te].sum() == 0 or y[te].sum() == te.sum():
                 per_subject.setdefault(held, {}).setdefault(seed, None); continue
             Xtr, ytr, _, _ = make_windows([X[i] for i in np.where(tr)[0]], y[tr], subj[tr], np.array(files)[tr])

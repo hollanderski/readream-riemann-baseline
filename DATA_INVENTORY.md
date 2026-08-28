@@ -118,6 +118,45 @@ achieves on REM-vs-NREM, one of the easiest discriminations in sleep EEG. And St
 why E-S1 is uninterpretable. Running it again with a valence target reproduces a known
 failure.
 
+
+## 4c. INCIDENT 2026-08-27: overwritten body_action record, and what it cost
+
+**What happened.** SLURM array `21408539` ran `train_shallowconv_emotion_cv.py` with 4
+tasks (1 real + 3 permutation nulls). The script wrote to a FIXED path,
+`logs/shallowconv_{target}_cv_result.json`, with no shuffle seed in the name. All four
+tasks wrote to the same file and raced. The last to finish won, and it was a shuffled run,
+so the surviving file contained a permutation null presented as a result. It also
+destroyed the pre-existing 2026-07-01 record.
+
+**Restored 2026-08-28.** `logs/shallowconv_body_action_cv_result.json` was rebuilt from
+`logs/shallowconv_body_action_cv_16926807.log`, which survived. The restored record carries
+a `_provenance` block saying so. The overwriting file is preserved as
+`...cv_result.OVERWRITTEN_BY_21408539.json` rather than deleted.
+
+**Fixed at source.** The output path now carries the shuffle seed.
+
+### The authoritative body_action numbers
+
+| run | date | architecture | per-fold night_acc | ensemble |
+|---|---|---|---|---|
+| `16920497` non-CV | 2026-07-01 | ShallowConvNetBackbone | n/a | 0.700 |
+| `16926807` 5-fold CV | 2026-07-01 | ShallowConvNetBackbone | 0.6 / 0.6 / 0.5 / 0.8 / 0.7 | **0.800** (8/10) |
+| `21408539_0` re-run | 2026-08-27 | same | 0.6 / 0.6 / 0.5 / 0.8 / 0.7 | **0.800** (8/10) |
+
+The August re-run **reproduces July exactly**, so the pipeline is deterministic and 0.800
+is solid. July used **ShallowConv, not EEGNet**.
+
+Permutation nulls on body_action (`21408539_1..3`): **0.600, 0.300, 0.600**, null mean 0.50.
+Real 0.800 exceeds all three, but with 3 permutations the minimum attainable p is 0.25.
+8/10 nights gives a binomial p of 0.055 against chance. Encouraging, not established.
+
+### Unresolved
+
+A THIRD body_action JSON existed before 2026-08-27 showing per-fold `[1.0, 0.7, 0.6, 0.5, 0.6]`,
+mean 0.680, `pool_prevalence` 0.503. It matches neither July log. Its source is unknown and
+it is the number that was quoted in this project as "body_action 0.680". **Treat 0.800 as
+the defensible figure and 0.680 as unsourced** until someone identifies that run.
+
 ## 5. The structural bind (why this keeps failing)
 
 The corpus with sleep stages has **one label per night**; the corpus with many labels has
