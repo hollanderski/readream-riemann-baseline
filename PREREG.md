@@ -182,3 +182,54 @@ anger sits at 0.390 unaligned, below chance, and its per-subject class priors ar
 skewed of the three labels. If recentring is doing what it should, anger should move
 toward chance or above. If anger stays at 0.39 after recentring, the prior-shift
 explanation for it is wrong.
+
+---
+
+# Addendum 3: 101-Nights body_action Riemannian arm + REM_Turku within-subject tangent
+Declared 2026-08-29 before the first fit of either. Deadline moved to today by Ninon.
+
+## Job B: 101-Nights body_action, tangent space next to ShallowConv 0.800
+
+Same data and same folds as the existing ShallowConv result, no re-splitting:
+`Dance101NightsBodyActionDataset` train+val merged as the CV pool, and
+`stratified_kfold_by_night(night_pool, y_pool, n_folds=5, seed=42)` reused verbatim.
+n=1 subject, so this is a WITHIN-DREAMER baseline by construction and is labelled as such.
+
+**Dimensionality, declared because it is a real choice.** Windows are 256 ch x 3200
+samples; a 256x256 covariance gives 32,896 tangent dimensions against a few hundred
+windows, which is hopeless. Two variants, both fixed now:
+- **PRIMARY: the 7 motor-strip channels** already defined in the project's own loader
+  (`MOTOR_STRIP_CHANS`), band-passed to its own `MOTOR_BAND_HZ` = 20-40 Hz. Motor cortex,
+  beta/low-gamma, for a body-action label: motivated before seeing any number.
+- Secondary: 32-component spatial PCA over all 256 channels.
+
+Pipeline: `Covariances(oas)` -> `TangentSpace(riemann)` -> `LDA(lsqr, shrinkage=auto)`.
+Metric: balanced accuracy, plus AUC, per fold and pooled.
+
+**Nulls: 100 label-shuffle draws for BOTH arms**, the tangent arm and ShallowConv, because
+the existing ShallowConv 0.800 has only 3 null draws (p floor 0.25) and cannot support a
+claim. Empirical 5th/95th percentile floor next to every number.
+
+## Job A: REM_Turku within-subject, tangent + shrinkage LDA
+
+Per subject: `Covariances(oas)` per epoch, `TangentSpace(riemann)` fit on that subject's
+TRAINING epochs only, `LDA(lsqr, shrinkage=auto)`. Leave-one-AWAKENING-out inside the
+subject; awakening-level prediction = mean of the held-out awakening's epoch decision
+values. Report awakening-level AND epoch-level balanced accuracy, then the subject mean.
+Skip subjects with fewer than 4 awakenings or a single class; state how many remain.
+
+**Composite label, defined before running** because single mDES items are too rare per
+dreamer for within-subject CV:
+  NEGATIVE = max over the negative items (NA1 anger, NA7 hate, NA8 sad, NA9 scared,
+             NA10 stressed)
+  POSITIVE = max over the positive items (PA1, PA4, PA7, PA8, PA10)
+  label = 1 if NEGATIVE > POSITIVE, 0 if POSITIVE > NEGATIVE, awakening DROPPED if equal.
+Reported alongside apprehension, anger and confusion. Class counts per subject reported.
+
+Null: within-subject label shuffle at AWAKENING level, 100 draws. Group test: Wilcoxon of
+per-subject accuracies against 0.5.
+
+## Standing rule, unchanged
+No number leaves this repo while its permutation p is at its floor. It has bitten three
+times: apprehension 0.646, the tangent p (0.0175 at 56 draws -> 0.055 at 199), and the
+seed-0 contamination that put the unshuffled observed inside its own null.
