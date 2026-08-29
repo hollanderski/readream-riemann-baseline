@@ -66,13 +66,48 @@ majority-class night accuracy IS 0.600, and all five independently fitted models
 byte-identical Set B accuracy: they predict one class for every night. Tangent + LDA does
 not discriminate on Set B at all.
 
-**Read the ShallowConv 80.0% with its size in view.** Set B is **10 nights and 28 windows**.
-80.0% is 8 of 10 nights, i.e. two nights above the majority baseline. Its 48-draw
-permutation null is running; until it lands, this number is not established.
+**The ShallowConv 80.0% does NOT survive its null: p=0.1765, resolved, not floor-limited.**
+Two of eighteen shuffles reached 0.8 and 0.9. The cause is the evaluation, not the model:
+Set B is **10 nights**, so night accuracy moves in steps of 0.1 and the permutation
+distribution spans 0.2 to 0.9 with sd 0.21. The observed sits 1.4 sd above a null centred
+at 0.506. No number of extra draws fixes a granularity problem. The null was stopped at 18
+of 48 once resolved, to free GPU for the protocol below.
 
 Inside the pool at window level the tangent arm reaches 0.5723 (AUC 0.6122) against a
 100-draw null centred at 0.5080, p=0.198, with per-fold values from 0.261 to 0.827. That
 spread is why one subject and five night folds cannot carry a claim.
+
+### 101-Nights body_action, repeated CV over ALL 65 nights (the protocol that replaces Set B)
+Prereg addendum 4. Every night held out exactly once per repeat, mean across folds, **no
+ensemble vote anywhere**. Majority baseline of the 65 nights = 0.5385.
+
+| arm | observed | null (mean, sd, 95th) | p |
+|---|---|---|---|
+| tangent + LDA, 7 motor ch | 0.5754 (sd 0.0345, 10 repeats) | 0.4988, 0.0532, **0.5846** (n=100) | **0.0792** |
+| ShallowConv | running | | |
+
+**The protocol works as intended: the null sd falls from 0.2106 on the 10-night Set B to
+0.0532 here, 4x tighter.** The evaluation was the problem. The tangent arm is still not
+significant, and note it read p=0.0816 and cleared its 95th percentile at 48 draws but
+does NOT clear it at 100 (0.5754 < 0.5846) — the same drift that killed two earlier
+numbers, and the reason interim p's are never quoted here.
+
+### Positive controls on REM_Turku: is the pipeline destroying signal?
+Label-free controls through the identical features, epochs and CV as every emotion arm.
+
+| control | observed | baseline | null mean, sd, MAX | p |
+|---|---|---|---|---|
+| subject identity, 17-way | **0.8947** | 0.0902 | 0.0576, 0.0245, max 0.1278 (n=84) | floor |
+| night 1 vs 2 | **0.8120** | 0.5338 | 0.4652, 0.0557, max 0.5714 (n=100) | floor |
+| subject sex | 0.7222 | 0.6241 | 0.5006, 0.1262, max 0.8333 (n=100) | 0.089 |
+| early vs late awakening | 0.5038 | 0.5188 | 0.4312, 0.0550, max 0.5940 (n=90) | 0.088 |
+
+Two controls pass decisively: the observed lies outside the ENTIRE null range in both
+cases, so their floor-limited p is a resolution limit, not uncertainty. **The emotion nulls
+cannot be attributed to a pipeline that destroys signal.** Sex and circadian position are
+non-significant, and early/late is non-significant rather than absent (0.5038 is above its
+own null mean of 0.4312). The night control carries a caveat: leave-one-awakening-out puts
+other awakenings of the same night in training, so part of 0.812 is session fingerprinting.
 
 ## Running it
 
