@@ -28,26 +28,51 @@ p=0.012** — but neither method separates from chance, so this is a method comp
 not a decoding claim.
 
 **anger, AUC, threshold-free: 0.3341 against a null centred at 0.5022, p=0.0100, passes
-Bonferroni over 3 labels.** The ranking is significantly INVERTED. Provisional; the
-mechanism test (`signtest.py`) has not completed.
+Bonferroni over 3 labels.** The ranking is significantly INVERTED, and the mechanism is
+measured: a held-out Simpson decomposition gives r = **+0.180 BETWEEN** dreamers and
+r = **-0.236 WITHIN** a dreamer. The pooled direction tracks anger positively across
+dreamers and negatively inside one, so a cross-subject decoder learns the between-subject
+axis and applies it within the held-out dreamer, where it ranks anger backwards. This also
+explains why per-subject recentring made it worse (0.334 -> 0.318): recentring removes
+subject MEANS, and the between-subject axis survives mean removal.
+Supported, not proven: one label of three, and the mechanism test has no null of its own.
 
-### REM_Turku, within-subject (leave-one-awakening-out)
-apprehension 0.4477, anger 0.3694, confusion 0.3604.
+### REM_Turku, within-subject (leave-one-awakening-out), all four labels closed
+| target | observed | its null (mean, sd) | p |
+|---|---|---|---|
+| apprehension | 0.4477 | 0.3856, sd 0.0662, n=82 | 0.205 |
+| negaff (composite) | 0.4408 | 0.4241, sd 0.0644, n=52 | 0.434 |
+| anger | 0.3694 | 0.4036, sd 0.0497, n=61 | 0.758 |
+| confusion | 0.3604 | 0.3917, sd 0.0610, n=62 | 0.667 |
 **Report these against their own null, never against 0.5.** The within-subject null
 centres at **0.3856** (tangent) and **0.4114** (DL) at this data scale, because 5-11
 training awakenings per fold is not a regime where balanced accuracy centres at chance.
 apprehension is ABOVE its null (p=0.205), not below chance.
 
-### 101-Nights body_action, 1 subject, 5-fold night CV
-| arm | bal.acc | null | p |
-|---|---|---|---|
-| tangent + LDA, 7 motor ch 20-40 Hz (prereg primary) | 0.5723 | 0.5080 | 0.198 |
-| tangent + LDA, PCA-32 over 256 ch | 0.4453 | | |
-| ShallowConv | **0.800** | running | **PENDING** |
+### 101-Nights body_action, 1 subject
+**Protocol: train on the 55-night pool with `stratified_kfold_by_night(seed=42)`, evaluate
+on the 10 held-out Set B nights at NIGHT level (majority over that night's windows),
+ensembling allowed for every method.** An earlier version of this table compared
+ensemble-ShallowConv on Set B against single-model tangent inside the pool at window level.
+That was not a comparison; it is fixed here.
 
-Per-fold spread for the tangent arm is 0.261 to 0.827. With one subject and five night
-folds the variance is enormous, which is exactly why the ShallowConv 0.800 on three null
-draws was never safe to quote.
+| arm | val night | Set B single-model | Set B ENSEMBLE |
+|---|---|---|---|
+| ShallowConv | 70.6% | 64.0% | **80.0%** |
+| tangent + LDA, 7 motor ch 20-40 Hz | 59.9% | 60.0% | 60.0% |
+
+**The tangent 60.0% is not a score.** Set B is 6 negative / 4 positive nights, so the
+majority-class night accuracy IS 0.600, and all five independently fitted models return
+byte-identical Set B accuracy: they predict one class for every night. Tangent + LDA does
+not discriminate on Set B at all.
+
+**Read the ShallowConv 80.0% with its size in view.** Set B is **10 nights and 28 windows**.
+80.0% is 8 of 10 nights, i.e. two nights above the majority baseline. Its 48-draw
+permutation null is running; until it lands, this number is not established.
+
+Inside the pool at window level the tangent arm reaches 0.5723 (AUC 0.6122) against a
+100-draw null centred at 0.5080, p=0.198, with per-fold values from 0.261 to 0.827. That
+spread is why one subject and five night folds cannot carry a claim.
 
 ## Running it
 
