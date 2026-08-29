@@ -84,7 +84,15 @@ ensemble vote anywhere**. Majority baseline of the 65 nights = 0.5385.
 | arm | observed | null (mean, sd, 95th) | p |
 |---|---|---|---|
 | tangent + LDA, 7 motor ch | 0.5754 (sd 0.0345, 10 repeats) | 0.4988, 0.0532, **0.5846** (n=100) | **0.0792** |
-| ShallowConv | running | | |
+| ShallowConv | **0.4923** (sd 0.0126, 3 repeats) | null running | below baseline |
+
+**ShallowConv does not reach the 0.5385 majority baseline under this protocol**, against
+0.800 on the Set B protocol. Three things differ and no single-cause claim is made without
+an ablation, but one of them is a validity issue rather than a power one: the project's
+`train_one_fold` selects its best epoch on `val_night_acc`, so in the Set B protocol the
+epoch was chosen on the fold being scored. The driver here passes the outer fold as the
+test set and carves an inner validation split out of the training nights. The other two
+differences are the ensemble vote and the 10-night test set, both removed here.
 
 **The protocol works as intended: the null sd falls from 0.2106 on the 10-night Set B to
 0.0532 here, 4x tighter.** The evaluation was the problem. The tangent arm is still not
