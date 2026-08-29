@@ -131,3 +131,54 @@ The global shuffle moved every subject's base rate together, which is itself a s
 perturbation across folds, so it manufactured the dependence it appeared to measure. The
 "LOSO nulls are 1.5x wider than independence predicts" claim is withdrawn. The table stays
 because it is a reusable warning for anyone running LOSO permutation tests.
+
+---
+
+# Addendum 2: alignment ladder on the tangent arm, declared 2026-08-29 before any fit
+
+Written before the first ladder fit. The cluster was unreachable at the time of writing
+(ssh control socket dead), so no ladder result could exist.
+
+## The fact that motivates it
+
+`tg_matched.py` built `Covariances(oas) -> TangentSpace(riemann) -> LogisticRegression`
+with NO recentring: a single Fréchet mean over the pooled training covariances, applied to
+the held-out subject as well. So the 0.570 / 0.390 / 0.491 reported for the "Riemannian
+arm" is the UN-ALIGNED tangent space. **The paper's actual method, domain alignment across
+subjects, has not been run.** Yesterday's null is a null for unaligned tangent space, which
+is a weaker and different statement than "Riemannian fails on REM_Turku".
+
+## The ladder, one ordered family, same 14 LOSO folds as the DL reference
+
+1. tangent, global reference (already run: 0.570 / 0.390 / 0.491)
+2. **tangent + per-subject recentring** (each subject's covariances whitened by its own
+   Riemannian mean; the held-out subject recentred with its OWN UNLABELLED mean, which is
+   legal under LOSO because it uses no test labels). **PRIMARY.**
+3. + stretch (RPA re-scale)
+4. + rotation (full RPA, Procrustes on training-subject class means)
+5. filter-bank tangent + recentring: theta 4-8, alpha 8-13, beta 13-30 concatenated
+6. late fusion: mean of DL and rung-2 probabilities
+
+## Declared in advance
+
+- **Primary: rung 2 on apprehension.** anger and confusion reported at the same rung,
+  Holm across the three labels.
+- **The paper's number is the paired rung-2 minus rung-1 difference**, the alignment gain,
+  on the same subjects. It does not depend on either arm's null centre.
+- Within-subject label-shuffle null per rung, 200 draws, empirical 95th percentile floor
+  printed next to every number.
+- Every rung is reported whichever way it comes out, including rungs that lose to rung 1.
+
+## Standing hazard, recorded because it has bitten three times in two days
+
+A permutation p at its floor is not evidence. Yesterday the tangent p read 0.0175 at 56
+draws (0 exceedances), 0.0333 at 59, and **0.0550 at 199**. Two other numbers dissolved the
+same way: apprehension 0.646 (favourable split) and "confusion below chance" (same split).
+No ladder number is quotable until its 200-draw null exists.
+
+## Prediction filed for the anger case
+
+anger sits at 0.390 unaligned, below chance, and its per-subject class priors are the most
+skewed of the three labels. If recentring is doing what it should, anger should move
+toward chance or above. If anger stays at 0.39 after recentring, the prior-shift
+explanation for it is wrong.
