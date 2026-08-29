@@ -233,3 +233,30 @@ per-subject accuracies against 0.5.
 No number leaves this repo while its permutation p is at its floor. It has bitten three
 times: apprehension 0.646, the tangent p (0.0175 at 56 draws -> 0.055 at 199), and the
 seed-0 contamination that put the unshuffled observed inside its own null.
+
+---
+
+# Addendum 4: repeated CV over all 65 nights, declared before the first fit
+
+Ninon's protocol (16:48Z), written after the 10-night Set B was shown to be untestable:
+the ShallowConv 0.800 gave p=0.1765 against a null centred at 0.506 with sd 0.21, because
+a night-level accuracy over 10 nights moves in steps of 0.1 and its permutation
+distribution spans 0.2 to 0.9. The fix is a larger evaluation, not another model.
+
+- **Nights:** all 65 labelled nights as one pool (the former 55-night pool + the 10 Set B
+  nights). The majority baseline of the 65 is reported next to every number.
+- **CV:** stratified 5-fold by night, repeated with fold seeds 0..R-1. Every night is held
+  out exactly once per repeat.
+- **Reported:** night-level held-out accuracy per fold; mean and sd across the 5 folds
+  within a repeat; mean across repeats. Balanced accuracy and window level as secondary.
+- **No ensemble vote anywhere.** The vote is what made the Set B comparison unfair and it
+  is removed from every arm.
+- **Null:** night-level label shuffle under the identical repeated CV, with the empirical
+  95th percentile of the null mean-across-folds printed next to the observed.
+- Tangent + shrinkage LDA: R=10 repeats, 100 null draws, CPU. ShallowConv: R=5, GPU, only
+  after the current null array drains, with its own 20-draw null under this protocol (the
+  48-draw Set B null is NOT reusable, different protocol).
+
+Every method added later, SPDNet and TSMNet included, runs through exactly this, at either
+library defaults for all or the same number of sampled configs for all. Not one tuned and
+one not.
