@@ -364,3 +364,37 @@ same legality class as Zanini recentring). Reported: epoch-level and awakening-l
 12-config matched-budget arm follows separately if time allows and is declared before it
 runs. Expected under the campaign's evidence: near chance; a positive result must clear
 a within-subject permutation null before it is called signal.
+
+---
+
+# Deviation log: arm cancelled mid-run on interim grounds, 2026-08-30
+
+Recording this because addendum 5 declares 9 arms and the delivered table will have 8.
+
+**What happened.** `21588621_1`, the shallow_bd / anger nested arm, was cancelled at 10 of
+17 outer folds to free a GPU slot for the SPDNet defaults row, on Ninon's request for SPD
+results immediately. The stated selection criterion was that arm's own interim inner
+validation sitting at chance, i.e. "lowest information of the six".
+
+**The objection, raised before the cancel and recorded here.** Choosing which arm to
+complete on the basis of that arm's interim results makes the missing table entry not
+missing at random: arms that looked promising were kept (arm _3 was named "the 60.4%
+candidate"), the flat one was dropped. anger is also the target carrying the campaign's
+only significant result, the inverted cross-subject AUC (0.3341, p=0.0100). A
+result-independent alternative was offered at the same time (cancel by work lost: either
+`nb` job stood at 2 of 17 folds against this arm's 10) and was not taken.
+
+**Why "inner val at chance" is not a defect.** Across all 10 scored folds the 12 sampled
+configs spanned 0.433-0.531 on inner validation. That is the direct measurement that
+selection has almost nothing to rank on this target at this data scale, which is the same
+finding the defaults-vs-swept comparison produced on 08-28 (0.6462 vs 0.6456). It is
+information, not its absence.
+
+**What was preserved.** All 10 scored folds are in
+`results/PARTIAL_CANCELLED_nested_shallow_bd_anger.json`, labelled `PARTIAL_CANCELLED`,
+partial mean 0.5417 (sd 0.1091, n=10 of 17). **It is not comparable to the 17-fold arms and
+must never be pooled with them.** The raw log is kept at
+`PARTIAL_CANCELLED_ns_21588621_1.out`.
+
+**How the table must read.** shallow_bd / anger is reported as incomplete with n stated and
+this deviation cited, not silently omitted and not filled with the partial mean.
