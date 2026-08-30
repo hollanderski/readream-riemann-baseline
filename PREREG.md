@@ -348,3 +348,19 @@ budget, so the comparison across corpora is budget-matched.
   Spending 20 GPU-draws to null a number below its own majority baseline buys nothing, and
   the ShallowConv defaults null already showed 11 of 20 shuffles beating an observed that
   sat below baseline.
+
+## Addendum 7 (2026-08-30T17:45Z, fundamental_ai, committed while job 21597446 is PENDING, before any fit)
+
+SPD-network DEFAULTS row on REM_Turku: TSMNet (Kobler et al., NeurIPS 2022), the
+authoritative rkobler/TSMNet repo imported unmodified (spdnets.models.TSMNet). Isolated
+venv on scratch (geoopt 0.5.1, pyriemann 0.12, torch 2.12.1); no shared env touched.
+Cross-subject LOSO, same 17-subject outer fold order as every other arm (ref17), same
+scorability rule (folds with a single test class skipped). Defaults declared: 4 temporal
+filters, 40 spatial, subspace 20, SPD domain-specific momentum-free batch norm (the
+method's core), RiemannianAdam lr 1e-3, 40 epochs, batch 256, seed 0, NO early stopping,
+no tuning. Test-subject batch norm adapts on unlabelled test data only (label-free, the
+same legality class as Zanini recentring). Reported: epoch-level and awakening-level
+(majority) balanced accuracy, per fold and mean. This is the DEFAULTS reference row; the
+12-config matched-budget arm follows separately if time allows and is declared before it
+runs. Expected under the campaign's evidence: near chance; a positive result must clear
+a within-subject permutation null before it is called signal.
