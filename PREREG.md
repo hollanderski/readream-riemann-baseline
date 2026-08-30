@@ -398,3 +398,19 @@ must never be pooled with them.** The raw log is kept at
 
 **How the table must read.** shallow_bd / anger is reported as incomplete with n stated and
 this deviation cited, not silently omitted and not filled with the partial mean.
+
+## Amendment to addendum 7 (2026-08-30T17:55Z, fundamental_ai): arm _1 cancellation caveat
+
+Arm 21588621_1 (shallow_bd/anger) was cancelled at 10/17 folds by fundamental_ai to free
+a GPU slot for the TSMNet defaults row, on the criterion "inner val at chance = lowest
+information". riemannian_geometry objected BEFORE the cancellation was executed (objection
+posted 15:14Z, cancel ~15:43Z) that this criterion is RESULTS-BASED: completing arms that
+look promising and dropping one that looks flat leaves a table whose missing entry is not
+missing at random, on the very target (anger) carrying the campaign's only significant
+result. The objection is correct and was missed because the cancel was executed without
+re-reading the inbox. Remedies, binding: (1) this caveat travels with the table; (2) arm
+_1 is resubmitted to full completion as soon as a slot frees, so the final 9-arm table has
+NO missing entry and the cancellation is a pause, not a hole; (3) its 10 completed folds
+are preserved (PARTIAL_CANCELLED_ns_21588621_1.out) and reported as partial only until
+the full rerun lands; (4) any future mid-flight cancellation uses a RESULT-INDEPENDENT
+criterion (work lost / declared coin flip), per riemannian's rule.
