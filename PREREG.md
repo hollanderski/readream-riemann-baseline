@@ -260,3 +260,48 @@ distribution spans 0.2 to 0.9. The fix is a larger evaluation, not another model
 Every method added later, SPDNet and TSMNet included, runs through exactly this, at either
 library defaults for all or the same number of sampled configs for all. Not one tuned and
 one not.
+
+---
+
+# Addendum 5: nested sweep on REM_Turku, matched selection budget. Declared before the first fit.
+
+fundamental_ai's ruling (2026-08-30 11:45Z), on Ninon's instruction to tune every DL
+architecture with her sweep code.
+
+## Budget, identical for every method
+**12 sampled configs per method**, drawn from that method's OWN declared grid, selected on
+the SAME inner splits. Not one tuned and one not: that asymmetry is the mirror image of the
+ensemble-vs-single-LDA problem Ninon caught on body_action, and it is what makes the
+existing SPDNet-on-Gao comparison unusable.
+
+## Nesting, which is the point
+Selection happens INSIDE each outer fold. For each of the 17 LOSO outer folds: sample the
+12 configs, score each on inner splits of that fold's TRAINING subjects only, take the
+winner, retrain it at full budget on all of that fold's training subjects, score once on
+the held-out subject. The outer subject never touches selection. A single sweep on one dev
+split followed by a frozen config, which is what our earlier arms did, is NOT nested and
+its number is optimistic by an unknown amount.
+
+## Grids, declared here
+- **DL (`shallow_bd`, `eegnet`, `shallow`)**: the project's `grid_for(n_ch)` from
+  `baseline_remturku.py`, 29 swept dimensions, with Ninon's constraints as already coded:
+  `F1*D <= n_channels` (NOT <= 64), `depthwise_kernel_length` genuinely varying, real grid
+  sampling rather than a hand-written config list.
+- **tangent + LDA**: `shrinkage` in {auto, 0.0, 0.1, 0.3, 0.5}, `metric` in
+  {riemann, logeuclid}, `estimator` in {oas, lwf, scm}, epoch decimation `sub` in {1, 2, 4}.
+  12 sampled from that product.
+- **SPDNet / TSMNet**: the repo's own hyperparameters, not invented ones, declared in a
+  further addendum before that arm launches.
+
+## Reported
+- Headline: **tuned vs tuned**, nested, per target.
+- One **defaults reference row per method**, clearly labelled, one run each.
+- Selection metric: inner-split balanced accuracy at awakening level (REM_Turku's unit),
+  not night accuracy, which is the 101-Nights unit.
+- Grid as executed, with singleton dimensions listed as fixed.
+- Within-subject permutation null on the winning arm; no p quoted while at its floor.
+
+## Declared in advance
+The nested number is expected to be LOWER than our earlier frozen-config numbers, because
+those selected once on a dev split and reported the same split family. If it comes out
+lower, that is the correction working, not a regression, and it gets reported either way.
