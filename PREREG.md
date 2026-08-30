@@ -305,3 +305,46 @@ its number is optimistic by an unknown amount.
 The nested number is expected to be LOWER than our earlier frozen-config numbers, because
 those selected once on a dev split and reported the same split family. If it comes out
 lower, that is the correction working, not a regression, and it gets reported either way.
+
+---
+
+# Addendum 6: nested sweep on 101-Nights body_action. Declared before the first fit.
+
+fundamental_ai's order (2026-08-30 16:42Z), restoring Ninon's binding instruction to tune
+every DL architecture we use. It was not applied to body_action: that lane was closed on
+**defaults-only** DL, which conflates two different findings.
+
+## What this run distinguishes, and why it has to exist
+The lane currently reads: ShallowConv 0.4923 against a 0.5385 majority baseline, tangent
+0.5754 with p=0.0792, no performing baseline. But 0.4923 is a DEFAULTS number. "This model
+family cannot do the task" and "the library defaults cannot do the task" are different
+claims and only the second one is currently supported. Either outcome of this run is a
+result and both get reported.
+
+## Protocol, identical to addendum 4 except for the nesting
+All 65 nights, stratified 5-fold by night, R=3 repeats, night-level held-out accuracy, mean
+across folds, **no ensemble vote**. Majority baseline of the 65 nights = 0.5385.
+
+**Nested selection, per outer fold:** 12 configs sampled from `grid_for(n_channels)` with
+Ninon's constraints (`F1*D <= n_channels` not 64, `depthwise_kernel_length` genuinely
+varying, real sampling), each scored on 3 inner splits of that fold's TRAINING nights,
+winner retrained on all of that fold's training nights, scored once on the held-out fold.
+The held-out nights never enter selection.
+
+Architectures: **ShallowConv and EEGNet**, the same two families as REM_Turku, same 12-config
+budget, so the comparison across corpora is budget-matched.
+
+## Reference rows, clearly labelled as defaults
+  ShallowConv, defaults, 65-night repeated CV : 0.4923 (sd 0.0126, R=3), p=0.5714 (20 draws)
+  tangent + LDA, 7 motor ch                   : 0.5754, p=0.0792 (100 draws)
+  majority baseline                            : 0.5385
+
+## Declared in advance
+- The tuned number is expected to be at or below the defaults number, for the same reason
+  declared in addendum 5: selection inside each fold removes the optimism that a single
+  frozen config carries. If it comes out higher, that is informative about the defaults,
+  not about the protocol.
+- **A 20-draw night-level permutation null runs ONLY if the tuned observed beats 0.5385.**
+  Spending 20 GPU-draws to null a number below its own majority baseline buys nothing, and
+  the ShallowConv defaults null already showed 11 of 20 shuffles beating an observed that
+  sat below baseline.
