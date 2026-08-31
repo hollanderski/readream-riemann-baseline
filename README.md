@@ -25,6 +25,31 @@ Bonferroni-passing) with a held-out Simpson decomposition as its mechanism.
 The pipeline is not the explanation: through the identical features and CV, subject
 identity decodes at 0.895 on 17 classes and recording night at 0.812.
 
+## Publishable results as of the freeze (2026-08-31), and the slot your contribution fills
+
+Significant or decisive, each with its null:
+
+| result | value | p |
+|---|---|---|
+| Tangent space beats matched deep learning, paired on identical LOSO folds (REM_Turku) | +2.9 pp, 11/14 subjects | 0.012 Wilcoxon |
+| TSMNet (SPD network) beats both tangent arms on anger, paired | +5.4 / +8.4 pp | 0.029 / 0.044 |
+| Anger decodes INVERTED cross-subject, mechanism measured (between-subject r = +0.18, within -0.24) | AUC 0.334 vs 0.502 | 0.010, Bonferroni |
+| Config-selection signal sits below the noise floor at 113 awakenings (three independent measurements) | inner spans 0.39-0.63 vs outer sd | measured, not asserted |
+| Positive controls through the identical pipeline: subject identity 17-way / recording night | 0.895 / 0.812 | null max 0.128 / 0.571 |
+
+Best absolute numbers on dream content, none clearing chance (the open problem):
+
+| corpus / target | best arm | value | p vs null |
+|---|---|---|---|
+| REM_Turku apprehension | TSMNet defaults | 58.5% (awakening level, n=14) | 0.14 |
+| 101-Nights body_action | tangent + LDA, 65-night repeated CV | 57.5% vs 53.9% majority | 0.079 |
+
+**The contribution slot:** a method that clears its own permutation null on either corpus,
+under this harness on these exact folds, is the headline result of the paper. Everything
+above is the floor it stands on: the paired geometry wins say where to look, the inversion
+says why per-subject structure matters, and the noise-floor measurement says why brute
+tuning will not get there.
+
 ## Four traps, each of which cost us a day
 
 1. **Permute labels WITHIN subject.** A global shuffle redraws each subject's base rate
