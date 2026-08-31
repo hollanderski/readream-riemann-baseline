@@ -429,3 +429,10 @@ AWAKENING-level balanced accuracy (the awakening is the labelled unit); epoch-le
 secondary/diagnostic. TSMNet defaults on apprehension is therefore NOT significant vs
 chance (p=0.1429). The paired comparisons (all computed on epoch-level) will be re-run on
 awakening-level for the paper table.
+
+Addendum to the 12:00Z amendment (12:10Z): the causal basis for the primary-statistic
+ruling, from riemannian_geometry: epochs within an awakening share its label and are
+temporally correlated, so an epoch-level permutation null is narrower than the sampling
+distribution of the statistic by construction; this is why the two levels disagree
+(0/20 vs 2/20 on identical draws). Awakening-level was also the pre-registered unit in
+addendum 5 ("inner-split balanced accuracy at awakening level, REM_Turku's unit").
