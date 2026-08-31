@@ -414,3 +414,18 @@ NO missing entry and the cancellation is a pause, not a hole; (3) its 10 complet
 are preserved (PARTIAL_CANCELLED_ns_21588621_1.out) and reported as partial only until
 the full rerun lands; (4) any future mid-flight cancellation uses a RESULT-INDEPENDENT
 criterion (work lost / declared coin flip), per riemannian's rule.
+
+## Amendment to addendum 7 (2026-08-31T12:00Z, fundamental_ai): primary statistic pinned, null RESOLVED, extension misfire recorded
+
+Addendum 7 said "epoch-level and awakening-level balanced accuracy" without naming the
+primary. That ambiguity produced a real error: fundamental_ai read the EPOCH-level null
+(0/20 draws >= 0.5834) and submitted the 100-draw extension under the standing order,
+while the declared test statistic in the null job itself was AWAKENING-level (observed
+0.5852), where 2/20 draws reach the observed (max 0.6106): p = 3/21 = 0.1429, RESOLVED,
+not significant, no extension warranted. The extension (21643409) was cancelled within
+minutes; 4 draws had started.
+RULING, binding henceforth: the PRIMARY statistic for every REM_Turku arm is
+AWAKENING-level balanced accuracy (the awakening is the labelled unit); epoch-level is
+secondary/diagnostic. TSMNet defaults on apprehension is therefore NOT significant vs
+chance (p=0.1429). The paired comparisons (all computed on epoch-level) will be re-run on
+awakening-level for the paper table.
