@@ -24,9 +24,13 @@ that were caught and corrected (each a fork in the garden even when fixed honest
   observed mean AUC **0.3353**, null mean 0.5002 (sd 0.0703, 95% [0.3609, 0.6388]),
   **p_lower = 0.0095 (18 exceedances), two-sided p = 0.0190**, floor 0.0005.
   18 exceedances means this is a measured p, not a floor-limited bound.
-- The 10x larger null did NOT change the verdict. At 199 draws the lower tail read
-  0.010; at 2000 it reads 0.0095. The conclusion below was never resting on the
-  draw count, and now that is on the record rather than assumed.
+- At 199 draws the lower tail read 0.010; at 2000 it reads 0.0095. **This agreement is
+  NOT evidence and is not cited as support** (see the reporting frame below). I first
+  recorded it here as robustness; that was an over-reading. With the same observed
+  statistic and a null centred at 0.5, more draws refine the estimate of the same
+  quantity, so agreement is what the arithmetic predicts, not an independent check.
+  The only thing it establishes is that 199 draws were already enough to resolve this
+  p away from its floor.
 - Bonferroni over the 3 labels alone: 0.0190 x 3 = **0.057**. Above 0.05 already.
 - Corrected against the honest campaign-wide count (~38): dead by an order of magnitude.
 - Caveat carried everywhere this number appears: the observed statistic is a **mean
