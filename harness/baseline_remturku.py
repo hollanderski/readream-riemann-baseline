@@ -29,12 +29,9 @@ import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader
 
-_repo_riemann = Path(__file__).resolve().parent.parent / "riemann"
-sys.path.insert(0, str(_repo_riemann))                     # repo checkout (Colab, local)
-sys.path.insert(0, "/orcd/scratch/orcd/010/ninon/reaDream/turku/riemann")  # cluster
-sys.path.insert(0, "/orcd/scratch/orcd/010/ninon/reaDream/turku")
-from dc_ldm.models.EEGNet_Embedding_version import EEGNet_Embedding      # noqa: E402
-from ShallowConv_Embedding_version import ShallowConv_Embedding          # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent))   # harness/ -> model_zoo importable
+from model_zoo.eegnet_embedding import EEGNet_Embedding                  # noqa: E402
+from model_zoo.shallowconv_embedding import ShallowConv_Embedding        # noqa: E402
 try:
     # braindecode 1.7 renamed EEGNetv4 -> EEGNet. Importing a name we do not use made
     # the whole try-block fail and silently set HAS_BD=False, which surfaced only as

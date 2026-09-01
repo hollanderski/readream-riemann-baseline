@@ -7,7 +7,7 @@ import pytorch_lightning as pl
 import sys 
 sys.path.append('G:/ninon_workspace/imagery2024/2D_Reconstruction/Generation_2D/reconstruction/code/')
 
-from dc_ldm.models.base_model import base_model
+from model_zoo.base_model import base_model  # flattened from dc_ldm 2026-09-01
 
 """
 Note: this code is adapted from https://github.com/braindecode/braindecode/tree/master/braindecode

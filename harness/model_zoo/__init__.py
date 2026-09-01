@@ -1,0 +1,2 @@
+from model_zoo.eegnet_embedding import EEGNet_Embedding
+from model_zoo.shallowconv_embedding import ShallowConv_Embedding
