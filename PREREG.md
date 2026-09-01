@@ -436,3 +436,25 @@ temporally correlated, so an epoch-level permutation null is narrower than the s
 distribution of the statistic by construction; this is why the two levels disagree
 (0/20 vs 2/20 on identical draws). Awakening-level was also the pre-registered unit in
 addendum 5 ("inner-split balanced accuracy at awakening level, REM_Turku's unit").
+
+## Addendum 8 (2026-09-01T13:50Z, fundamental_ai, committed BEFORE any battery fit): anger-inversion robustness battery, from external review
+
+Pipeline: identical to the reported arm (OAS covariances, tangent space, shrinkage LDA,
+LOSO over subjects, epoch level). Items and predictions, in run order with stop rules:
+1. Per-subject sign plot: per held-out subject AUC with n. Stop rule: if the 2 most
+   extreme subjects' removal moves p past 0.05, claim softens to subject-heterogeneous.
+2. Literal demeaning: tangent features AND label demeaned within subject; LOSO linear
+   readout; held-out within-subject correlation vs within-subject-shuffled null.
+   Prediction (from the recentred arm's surviving inversion): r stays negative.
+3. Mediator regression: within-subject anger~projection relation partialled on case
+   order, time of awakening, last sleep stage, duration, artifact proportion. If the
+   negative relation is absorbed by mediators, the paper reports nuisance, not anger.
+4. Null extension to 1999 within-subject-shuffled draws, lower-tail AND two-sided
+   reported; the lower-tail reading is acknowledged as post hoc if the ledger (item 6)
+   finds no prior declaration.
+5. Mixed effects with random SLOPES: label ~ proj + (proj | subject); the slope
+   distribution is the within-subject claim.
+6. Multiplicity ledger: exhaustive fork count on REM_Turku emotion decoding with dates;
+   anger p corrected against it; prereg-timeline check for the AUC test. If the
+   corrected p dies, the paper's framing becomes hypothesis-generating with the Tononi
+   replication pre-registered as the confirmatory test.
