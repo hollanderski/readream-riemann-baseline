@@ -39,8 +39,19 @@ that were caught and corrected (each a fork in the garden even when fixed honest
   so it biases nothing); awakenings per subject range 2-12, so the per-subject AUCs the
   mean is taken over are not equally precise.
 - Battery item 5 (mixed-model slopes) returned **fixed_proj_p = NaN** despite reporting
-  converged. That item supports nothing until the NaN is explained; it is not counted
-  as descriptive support below.
+  converged: a singular random-effects fit dressed as success. DROPPED, not debugged.
+- **Item 5b replaces it** (prereg f98299d declared the terms before the result;
+  `harness/item5b.py`, projection block copied verbatim from battery_anger.py so it is
+  the same code path items 3 and 5 used). Per subject, OLS slope of label on the
+  within-subject LOSO projection, one-sample Wilcoxon on the 16 slopes against zero:
+  **13/16 slopes negative, median -0.0707, order-statistic 95% CI [-0.1106, -0.0275]
+  (excludes 0), Wilcoxon two-sided p = 0.0214.** No subject was skipped. No optimizer,
+  nothing to converge, nothing to dress up.
+- **Item 5b is a FOURTH view of the same quantity, not new evidence.** Its slopes come
+  from the same held-out LOSO predictions as the 14/16 sign test, the AUC and the
+  demeaned r. It is reported as descriptive support and is never added to them as
+  independent confirmation. That its p (0.0214) is weaker than the sign test's (0.0042)
+  is a property of the statistic, not a second effect.
 
 ## Verdict, binding for the workshop paper
 
