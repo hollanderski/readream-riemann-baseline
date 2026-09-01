@@ -20,9 +20,23 @@ that were caught and corrected (each a fork in the garden even when fixed honest
 
 ## The math
 
-- p = 0.010 lower-tail at 199 draws, post hoc tail: two-sided ~ 0.02.
-- Bonferroni over the 3 labels alone: ~ 0.06. Above 0.05 already.
+- FINAL null, 2000 draws (array 21740825, closed 2026-09-01 ~16:26Z, 50/50 tasks):
+  observed mean AUC **0.3353**, null mean 0.5002 (sd 0.0703, 95% [0.3609, 0.6388]),
+  **p_lower = 0.0095 (18 exceedances), two-sided p = 0.0190**, floor 0.0005.
+  18 exceedances means this is a measured p, not a floor-limited bound.
+- The 10x larger null did NOT change the verdict. At 199 draws the lower tail read
+  0.010; at 2000 it reads 0.0095. The conclusion below was never resting on the
+  draw count, and now that is on the record rather than assumed.
+- Bonferroni over the 3 labels alone: 0.0190 x 3 = **0.057**. Above 0.05 already.
 - Corrected against the honest campaign-wide count (~38): dead by an order of magnitude.
+- Caveat carried everywhere this number appears: the observed statistic is a **mean
+  over 16 scorable subjects of 17** (one subject single-class, skipped by the LOSO
+  scorability rule for the observed AND every null draw alike, measured over 400 draws,
+  so it biases nothing); awakenings per subject range 2-12, so the per-subject AUCs the
+  mean is taken over are not equally precise.
+- Battery item 5 (mixed-model slopes) returned **fixed_proj_p = NaN** despite reporting
+  converged. That item supports nothing until the NaN is explained; it is not counted
+  as descriptive support below.
 
 ## Verdict, binding for the workshop paper
 
