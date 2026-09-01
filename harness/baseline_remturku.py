@@ -29,7 +29,9 @@ import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader
 
-sys.path.insert(0, "/orcd/scratch/orcd/010/ninon/reaDream/turku/riemann")
+_repo_riemann = Path(__file__).resolve().parent.parent / "riemann"
+sys.path.insert(0, str(_repo_riemann))                     # repo checkout (Colab, local)
+sys.path.insert(0, "/orcd/scratch/orcd/010/ninon/reaDream/turku/riemann")  # cluster
 sys.path.insert(0, "/orcd/scratch/orcd/010/ninon/reaDream/turku")
 from dc_ldm.models.EEGNet_Embedding_version import EEGNet_Embedding      # noqa: E402
 from ShallowConv_Embedding_version import ShallowConv_Embedding          # noqa: E402
