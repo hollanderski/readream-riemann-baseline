@@ -458,3 +458,17 @@ LOSO over subjects, epoch level). Items and predictions, in run order with stop 
    anger p corrected against it; prereg-timeline check for the AUC test. If the
    corrected p dies, the paper's framing becomes hypothesis-generating with the Tononi
    replication pre-registered as the confirmatory test.
+
+## Amendment to addendum 8, item 5b (2026-09-01T16:45Z, declared BEFORE the rerun's result is read)
+
+Item 5 is rerun as per-subject OLS slopes (label on held-out projection, within subject)
+with a one-sample Wilcoxon on the 16 slopes. Declared now: PREDICTION = median slope
+negative; TEST = two-sided; STATUS = descriptive support only, regardless of outcome.
+Reporting reframe, also declared: the headline statistic of the anger battery is the
+SIGN TEST (14/16 subjects below chance, exact binomial two-sided), which is
+distribution-free and independent of null construction; the AUC and its permutation p
+are the EFFECT SIZE. The three numbers (14/16, AUC 0.335, demeaned r -0.278) are three
+views of ONE quantity computed on one set of held-out predictions and are never to be
+presented as independent converging evidence. Precision statement: at 2000 draws the
+standard error of p is ~0.002, so p = 0.0095 +/- 0.002 is a measurement; the 199-vs-2000
+agreement is expected, not evidential.
