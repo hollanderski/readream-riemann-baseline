@@ -51,3 +51,24 @@ within-subject-shuffled null at >= 1999 draws, single label (anger), single arm
 
 Every null in the campaign was reported, and this ledger exists because we counted our
 own forks before a reviewer had to.
+
+## Reporting frame, final (2026-09-01T16:50Z, per external review round 3; prereg f98299d declared the item-5b terms before its result)
+
+- HEADLINE STATISTIC: the sign test. 14 of 16 held-out subjects below chance, exact
+  binomial two-sided p = 0.0042. Distribution-free, independent of the permutation
+  null's construction.
+- EFFECT SIZE: mean AUC 0.3353, bootstrap-over-subjects 95% CI [0.2415, 0.4348]
+  (excludes 0.5); permutation p = 0.0095 +/- 0.002 (SE at 2000 draws): a measurement.
+  The 199-vs-2000 agreement is expected, not evidential, and is not cited as support.
+- DEPENDENCE, stated: 14/16, AUC 0.335, and demeaned r = -0.278 are three views of one
+  quantity computed on one set of held-out predictions; they are never presented as
+  independent converging evidence.
+- SUBJECT 16: excluded because all 3 of its scorable awakenings carry anger = 0; AUC
+  is mathematically undefined on a single-class test set (the metric raises, no number
+  ever existed to see). The n = 16 count appears in the first anger arm (ref17,
+  2026-08-28) which predates the AUC analysis (nulls begun 08-29 08:07): the exclusion
+  is forced by definition and predates the result. No fork.
+- DEPLOYMENT IMPLICATION: demeaning failing to repair the sign closes the easy path
+  (per-subject normalization + fixed sign). Any cross-subject anger decoder requires an
+  explicitly learned sign inversion, which is precisely what the pre-registered Tononi
+  test exists to validate.
