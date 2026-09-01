@@ -18,7 +18,8 @@ method is ~20 lines and gets scored on exactly the folds every existing arm used
 Every arm on both corpora is null. REM_Turku: three DL architectures, tangent space with
 and without per-subject recentring, within-subject leave-one-awakening-out, TSMNet, and a
 12-config nested sweep. 101-Nights body_action: tangent and ShallowConv under a 65-night
-repeated CV, neither reaching the 0.5385 majority baseline. **The one significant result is
+repeated CV, neither reaching the 0.5385 majority baseline, and a 12-config nested sweep
+putting both DL families at 0.4769, below the defaults row and below baseline. **The one significant result is
 anger's cross-subject ranking being significantly INVERTED** (AUC 0.3341, p=0.0100,
 Bonferroni-passing) with a held-out Simpson decomposition as its mechanism.
 
