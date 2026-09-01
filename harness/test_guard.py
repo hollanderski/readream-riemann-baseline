@@ -47,6 +47,62 @@ def test_notebook_cells_are_not_jammed():
     print(f"  notebooks not jammed: {len(nbs)} checked")
 
 
+def test_jam_detector_actually_detects_jams():
+    """Negative control for the detector itself.
+
+    test_notebook_cells_are_not_jammed only proves the repo is clean. If
+    nbsafe.verify ever regressed to returning [] unconditionally, that test would
+    keep passing and we would be back to shipping jams with a green run. So the
+    detector has to be shown FAILING on each defect it claims to catch.
+
+    Same principle as the dead guard: a check that has never been observed failing
+    is not evidence. Every case below is a form that actually reached disk or is
+    one edit away from it.
+    """
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import nbsafe
+
+    def cell(src, kind="code"):
+        c = {"cell_type": kind, "source": src, "metadata": {}}
+        if kind == "code":
+            c.update(outputs=[], execution_count=None)
+        return {"cells": [c], "metadata": {}, "nbformat": 4, "nbformat_minor": 5}
+
+    body = "import os\nx = 1\nprint(x)"
+    cases = [
+        # the exact defect that shipped: split() drops the terminators
+        ("split without keepends", cell(body.split("\n"))),
+        # what it looks like once nbformat has rejoined it
+        ("single-line jam", cell(["".join(body.split("\n"))])),
+        # a whole-string source: legal-ish JSON, breaks line-wise editing
+        ("source is a str", cell(body)),
+        # the detector must not go blind on markdown
+        ("markdown jam", cell(["a long markdown line " * 8], kind="markdown")),
+        # ast.parse arm, independent of the newline arm
+        ("syntax error", cell(nbsafe.lines("def f(:\n    pass"))),
+    ]
+    for label, nb in cases:
+        problems = nbsafe.verify(nb)
+        assert problems, f"detector MISSED {label!r}: it is not detecting what it claims"
+
+    # and it must stay quiet on correctly built source, or it is just noise
+    assert not nbsafe.verify(cell(nbsafe.lines(body))), "detector fires on valid source"
+
+    # dump() must refuse rather than write a jam to disk
+    import tempfile, os as _os
+    fd, tmp = tempfile.mkstemp(suffix=".ipynb"); _os.close(fd)
+    try:
+        try:
+            nbsafe.dump(cell(body.split("\n")), tmp)
+        except SystemExit:
+            pass
+        else:
+            raise AssertionError("dump() wrote a jammed notebook instead of refusing")
+    finally:
+        _os.path.exists(tmp) and _os.unlink(tmp)
+    print(f"  jam detector fails on all {len(cases)} defect forms, quiet on valid source")
+
+
 if __name__ == "__main__":
     tests = sorted(k for k, v in list(globals().items())
                    if k.startswith("test_") and callable(v))
